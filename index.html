@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Statistical Learning — Built From Scratch</title>
+<meta name="description" content="An original from-scratch build of the core statistical-learning methods — linear and logistic regression, regularisation, trees, resampling — implemented and explained from first principles." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --accent:#1e40af; --accent-soft:#e8edfb; --ink:#0f1626; --muted:#4c566c;
+    --line:#d9e0f2; --bg:#f8faff; --card:#ffffff;
+    --serif:'Fraunces',Georgia,serif; --sans:'Inter',system-ui,sans-serif; --mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.65;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:0 28px}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  code{font-family:var(--mono);font-size:.86em;background:var(--accent-soft);padding:.1em .4em;border-radius:4px;color:#1e3a8a}
+  h1,h2,h3{font-family:var(--serif);font-weight:500;line-height:1.15;letter-spacing:-.01em}
+  header.hero{padding:88px 0 56px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:.74rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin:0 0 22px}
+  h1{font-size:clamp(2.6rem,6vw,4.1rem);margin:0 0 18px}
+  .lede{font-size:1.22rem;color:var(--muted);max-width:62ch;margin:0 0 28px}
+  .meta{display:flex;flex-wrap:wrap;gap:10px;font-size:.82rem}
+  .chip{font-family:var(--mono);font-size:.72rem;letter-spacing:.04em;border:1px solid var(--line);border-radius:999px;padding:5px 12px;color:var(--muted);background:var(--card)}
+  section{padding:54px 0;border-bottom:1px solid var(--line)}
+  .kicker{font-family:var(--mono);font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:0 0 14px}
+  h2{font-size:clamp(1.7rem,3.4vw,2.3rem);margin:0 0 20px}
+  h3{font-size:1.2rem;margin:0 0 6px}
+  p{margin:0 0 18px;max-width:68ch}
+  .muted{color:var(--muted)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:8px}
+  .tool{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+  .tool .t{font-family:var(--mono);font-size:.78rem;color:var(--accent);letter-spacing:.04em;margin-bottom:8px}
+  .tool h3{font-size:1.05rem;font-family:var(--sans);font-weight:600;margin-bottom:6px}
+  .tool p{font-size:.92rem;color:var(--muted);margin:0}
+  ol.flow{counter-reset:s;list-style:none;padding:0;margin:24px 0 0}
+  ol.flow li{position:relative;padding:18px 0 18px 56px;border-top:1px solid var(--line)}
+  ol.flow li:before{counter-increment:s;content:counter(s,decimal-leading-zero);position:absolute;left:0;top:18px;font-family:var(--mono);font-size:.8rem;color:var(--accent);border:1px solid var(--line);border-radius:8px;width:38px;height:38px;display:grid;place-items:center;background:var(--card)}
+  ol.flow li h3{font-family:var(--sans);font-size:1.02rem;font-weight:600;margin:0 0 4px}
+  ol.flow li p{margin:0;font-size:.93rem;color:var(--muted)}
+  .callout{background:var(--accent-soft);border:1px solid #c5d2f3;border-radius:14px;padding:24px 26px;margin-top:8px}
+  .callout p:last-child{margin:0}
+  ul.learn{list-style:none;padding:0;margin:8px 0 0}
+  ul.learn li{padding:14px 0 14px 30px;border-top:1px solid var(--line);position:relative;color:var(--muted);max-width:68ch}
+  ul.learn li:before{content:"→";position:absolute;left:0;color:var(--accent);font-family:var(--mono)}
+  ul.learn li b{color:var(--ink);font-weight:600}
+  .price{display:flex;align-items:baseline;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 26px;margin-top:8px}
+  .price .n{font-family:var(--serif);font-size:2.6rem;color:var(--accent);line-height:1}
+  .price .l{color:var(--muted);font-size:.95rem}
+  footer{padding:48px 0 80px}
+  .credit{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px}
+  .credit .k{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+  footer .fine{font-size:.8rem;color:var(--muted);margin-top:22px;text-align:center}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">From-Scratch Build · Machine Learning</p>
+    <h1>Statistical Learning</h1>
+    <p class="lede">Before the neural networks, there's a quieter, deeper toolkit: regression, regularisation, resampling, trees — the methods that taught the field how to learn from data and, just as importantly, how to know when it's fooling itself. I rebuilt the core of statistical learning from scratch because implementing these is the only way to truly own the ideas underneath everything else.</p>
+    <div class="meta">
+      <span class="chip">Python</span><span class="chip">NumPy</span><span class="chip">Regression</span>
+      <span class="chip">Regularisation</span><span class="chip">Cross-validation</span><span class="chip">Bias–variance</span>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <p class="kicker">What it is</p>
+    <h2>The foundations, implemented not imported</h2>
+    <p>Statistical learning is the bedrock the whole modern field stands on — the formal study of estimating relationships from data and reasoning about how well those estimates will generalise. This build works through the canon methodically: ordinary least squares, logistic regression, ridge and lasso, decision trees, and the resampling machinery that holds them all accountable.</p>
+    <p>The discipline is in <i>not</i> calling a library. Coding gradient descent, the normal equations, a regularisation penalty and a k-fold loop by hand turns abstract chapters into mechanisms you can see move. And running through everything is the one idea that matters most: the tug-of-war between bias and variance.</p>
+    <div class="price">
+      <div class="n">bias ⇄ variance</div>
+      <div class="l">the central trade-off every method negotiates — too simple and it underfits, too flexible and it memorises noise.</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="kicker">The toolkit</p>
+    <h2>The methods, from first principles</h2>
+    <p class="muted">Each one built to be understood, then stress-tested on data.</p>
+    <div class="grid">
+      <div class="tool"><div class="t">regression</div><h3>Linear &amp; logistic</h3><p>Fit continuous and binary outcomes — the workhorses, derived from the loss up.</p></div>
+      <div class="tool"><div class="t">optimise</div><h3>Gradient descent</h3><p>The engine that minimises a loss step by step — implemented so its behaviour is no longer a black box.</p></div>
+      <div class="tool"><div class="t">regularise</div><h3>Ridge &amp; lasso</h3><p>Penalise complexity to fight overfitting — and watch lasso quietly select features.</p></div>
+      <div class="tool"><div class="t">nonlinear</div><h3>Decision trees</h3><p>Recursive splits that carve the feature space — interpretable, and a gateway to ensembles.</p></div>
+      <div class="tool"><div class="t">validate</div><h3>Cross-validation</h3><p>k-fold resampling to estimate true out-of-sample error rather than fooling yourself on training data.</p></div>
+      <div class="tool"><div class="t">diagnose</div><h3>Bias–variance analysis</h3><p>Decompose error to see <i>why</i> a model fails, not just that it does.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="kicker">Architecture</p>
+    <h2>How each method is studied</h2>
+    <p>Every technique goes through the same honest cycle:</p>
+    <ol class="flow">
+      <li><h3>Derive</h3><p>Start from the loss function and work out the update rule on paper.</p></li>
+      <li><h3>Implement</h3><p>Code it in NumPy — no library shortcut for the core mechanism.</p></li>
+      <li><h3>Fit</h3><p>Train it on real data and watch the parameters converge.</p></li>
+      <li><h3>Validate</h3><p>Use cross-validation to estimate how it will actually generalise.</p></li>
+      <li><h3>Compare</h3><p>Place it against the others through the bias–variance lens.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="kicker">Reflection</p>
+    <h2>What rebuilding it taught me</h2>
+    <ul class="learn">
+      <li><b>Implementing demystifies.</b> Gradient descent and the normal equations stop being magic the moment you've written them yourself.</li>
+      <li><b>Regularisation is a worldview.</b> The penalty term encodes a belief that simpler is safer — and lasso turns that belief into automatic feature selection.</li>
+      <li><b>Validation is the real science.</b> A model's training score is vanity; cross-validation is the only honest measure of what it'll do in the wild.</li>
+      <li><b>Bias–variance explains everything.</b> Almost every failure and fix in ML is a move along this one axis.</li>
+      <li><b>Simple models earn their keep.</b> A well-regularised linear model is interpretable, fast, and shockingly competitive — the baseline you must beat.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="credit">
+      <div class="k">About this build</div>
+      <p style="margin:0">An original, from-scratch build by <b>Andrea</b> — written to learn the foundations of statistical learning by implementing them: regression, gradient descent, regularisation, trees, cross-validation and bias–variance analysis. Plain HTML/CSS, deployed on GitHub Pages.</p>
+    </div>
+    <p class="fine">Built from scratch by Andrea · one of an ongoing series of learning builds.</p>
+  </div>
+</footer>
+</body>
+</html>
