@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Statistical Learning — Built From Scratch</title>
-<meta name="description" content="An original from-scratch build of the core statistical-learning methods — linear and logistic regression, regularisation, trees, resampling — implemented and explained from first principles." />
+<meta name="description" content="statlearn — a small Python library implementing the core statistical-learning methods (linear & logistic regression, ridge/lasso, CART trees, k-fold CV, bootstrap) from scratch with numpy, cross-checked against scikit-learn." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -53,6 +53,16 @@
   .price{display:flex;align-items:baseline;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 26px;margin-top:8px}
   .price .n{font-family:var(--serif);font-size:2.6rem;color:var(--accent);line-height:1}
   .price .l{color:var(--muted);font-size:.95rem}
+  pre{background:#0f1626;color:#e8edfb;border-radius:14px;padding:20px 22px;overflow-x:auto;font-family:var(--mono);font-size:.82rem;line-height:1.6;margin:8px 0 0}
+  pre code{background:none;color:inherit;padding:0;font-size:1em}
+  pre .c{color:#8aa0d6}pre .k{color:#9ad0ff}pre .s{color:#bdf0c8}
+  table.metrics{width:100%;border-collapse:collapse;margin-top:8px;font-size:.92rem}
+  table.metrics th,table.metrics td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line)}
+  table.metrics th{font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500}
+  table.metrics td.v{font-family:var(--mono);color:var(--accent);text-align:right;white-space:nowrap}
+  table.metrics caption{caption-side:bottom;color:var(--muted);font-size:.8rem;margin-top:10px;text-align:left}
+  .runbar{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+  .runbar code{font-size:.82rem}
   footer{padding:48px 0 80px}
   .credit{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px}
   .credit .k{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
@@ -64,10 +74,10 @@
   <div class="wrap">
     <p class="eyebrow">From-Scratch Build · Machine Learning</p>
     <h1>Statistical Learning</h1>
-    <p class="lede">Before the neural networks, there's a quieter, deeper toolkit: regression, regularisation, resampling, trees — the methods that taught the field how to learn from data and, just as importantly, how to know when it's fooling itself. I rebuilt the core of statistical learning from scratch because implementing these is the only way to truly own the ideas underneath everything else.</p>
+    <p class="lede"><code>statlearn</code> is a small Python library that implements the core statistical-learning methods from scratch with numpy: linear and logistic regression, ridge and lasso, a CART decision tree, k-fold cross-validation and the bootstrap. No scikit-learn touches the algorithms — it's used only in the tests to check each implementation against a reference, and in the demo to load datasets.</p>
     <div class="meta">
-      <span class="chip">Python</span><span class="chip">NumPy</span><span class="chip">Regression</span>
-      <span class="chip">Regularisation</span><span class="chip">Cross-validation</span><span class="chip">Bias–variance</span>
+      <span class="chip">Python</span><span class="chip">NumPy only</span><span class="chip">20 tests passing</span>
+      <span class="chip">cross-checked vs scikit-learn</span><span class="chip">MIT</span>
     </div>
   </div>
 </header>
@@ -76,11 +86,12 @@
   <div class="wrap">
     <p class="kicker">What it is</p>
     <h2>The foundations, implemented not imported</h2>
-    <p>Statistical learning is the bedrock the whole modern field stands on — the formal study of estimating relationships from data and reasoning about how well those estimates will generalise. This build works through the canon methodically: ordinary least squares, logistic regression, ridge and lasso, decision trees, and the resampling machinery that holds them all accountable.</p>
-    <p>The discipline is in <i>not</i> calling a library. Coding gradient descent, the normal equations, a regularisation penalty and a k-fold loop by hand turns abstract chapters into mechanisms you can see move. And running through everything is the one idea that matters most: the tug-of-war between bias and variance.</p>
-    <div class="price">
-      <div class="n">bias ⇄ variance</div>
-      <div class="l">the central trade-off every method negotiates — too simple and it underfits, too flexible and it memorises noise.</div>
+    <p>A compact <code>statlearn/</code> package where each estimator is written out by hand in numpy and shares one <code>fit(X, y)</code> / <code>predict(X)</code> interface. Linear models expose <code>coef_</code> and <code>intercept_</code> after fitting; the logistic model adds <code>predict_proba</code>. The point is that nothing is a black box — the normal equation, the gradient-descent loop, the soft-thresholding step in lasso and the k-fold split are all right there in the source.</p>
+    <p>Correctness isn't taken on faith. The <code>tests/</code> suite re-derives the same fit with scikit-learn and asserts the from-scratch coefficients, accuracies and split sizes agree within tolerance — 20 tests, all passing.</p>
+    <div class="runbar">
+      <code>pip install -r requirements.txt</code>
+      <code>python -m pytest -q</code>
+      <code>python demo.py</code>
     </div>
   </div>
 </section>
@@ -89,44 +100,66 @@
   <div class="wrap">
     <p class="kicker">The toolkit</p>
     <h2>The methods, from first principles</h2>
-    <p class="muted">Each one built to be understood, then stress-tested on data.</p>
+    <p class="muted">Each one built to be understood, then cross-checked against scikit-learn.</p>
     <div class="grid">
-      <div class="tool"><div class="t">regression</div><h3>Linear &amp; logistic</h3><p>Fit continuous and binary outcomes — the workhorses, derived from the loss up.</p></div>
-      <div class="tool"><div class="t">optimise</div><h3>Gradient descent</h3><p>The engine that minimises a loss step by step — implemented so its behaviour is no longer a black box.</p></div>
-      <div class="tool"><div class="t">regularise</div><h3>Ridge &amp; lasso</h3><p>Penalise complexity to fight overfitting — and watch lasso quietly select features.</p></div>
-      <div class="tool"><div class="t">nonlinear</div><h3>Decision trees</h3><p>Recursive splits that carve the feature space — interpretable, and a gateway to ensembles.</p></div>
-      <div class="tool"><div class="t">validate</div><h3>Cross-validation</h3><p>k-fold resampling to estimate true out-of-sample error rather than fooling yourself on training data.</p></div>
-      <div class="tool"><div class="t">diagnose</div><h3>Bias–variance analysis</h3><p>Decompose error to see <i>why</i> a model fails, not just that it does.</p></div>
+      <div class="tool"><div class="t">linear.py</div><h3>Linear regression</h3><p>OLS two ways — the normal equation in closed form, and batch gradient descent on the MSE loss. Both converge to the same fit.</p></div>
+      <div class="tool"><div class="t">linear.py</div><h3>Ridge &amp; lasso</h3><p>Ridge is closed-form L2 on centred data; lasso runs coordinate descent with soft-thresholding, zeroing weak coefficients outright.</p></div>
+      <div class="tool"><div class="t">logistic.py</div><h3>Logistic regression</h3><p>Binary classifier via gradient descent on cross-entropy, with a numerically stable sigmoid and <code>predict_proba</code>.</p></div>
+      <div class="tool"><div class="t">tree.py</div><h3>Decision tree (CART)</h3><p>Greedy recursive binary splits — Gini impurity for classification, variance reduction for regression.</p></div>
+      <div class="tool"><div class="t">resampling.py</div><h3>k-fold cross-validation</h3><p>Index-based folds whose sizes match scikit-learn's <code>KFold</code>, plus a <code>cross_val_score</code> driver.</p></div>
+      <div class="tool"><div class="t">resampling.py</div><h3>Bootstrap</h3><p>Resample with replacement; the held-out out-of-bag rows (~37%) give an honest generalisation estimate.</p></div>
     </div>
   </div>
 </section>
 
 <section>
   <div class="wrap">
-    <p class="kicker">Architecture</p>
-    <h2>How each method is studied</h2>
-    <p>Every technique goes through the same honest cycle:</p>
-    <ol class="flow">
-      <li><h3>Derive</h3><p>Start from the loss function and work out the update rule on paper.</p></li>
-      <li><h3>Implement</h3><p>Code it in NumPy — no library shortcut for the core mechanism.</p></li>
-      <li><h3>Fit</h3><p>Train it on real data and watch the parameters converge.</p></li>
-      <li><h3>Validate</h3><p>Use cross-validation to estimate how it will actually generalise.</p></li>
-      <li><h3>Compare</h3><p>Place it against the others through the bias–variance lens.</p></li>
-    </ol>
+    <p class="kicker">Usage</p>
+    <h2>One interface, all the way down</h2>
+    <p>Every estimator is a plain object you <code>fit</code> then <code>predict</code> with — and the resampling helpers take any of them:</p>
+    <pre><code><span class="k">import</span> numpy <span class="k">as</span> np
+<span class="k">from</span> statlearn <span class="k">import</span> LinearRegression, LogisticRegression, cross_val_score
+
+X = np.random.randn(<span class="s">200</span>, <span class="s">3</span>)
+y = X @ np.array([<span class="s">2.0</span>, -<span class="s">1.0</span>, <span class="s">0.5</span>]) + <span class="s">0.1</span> * np.random.randn(<span class="s">200</span>)
+
+model = LinearRegression(method=<span class="s">"normal"</span>).fit(X, y)
+<span class="k">print</span>(model.coef_, model.intercept_)
+<span class="k">print</span>(model.score(X, y))                 <span class="c"># R^2 on the data</span>
+
+scores = cross_val_score(LinearRegression(), X, y, n_splits=<span class="s">5</span>, scoring=<span class="s">"r2"</span>)
+<span class="k">print</span>(scores.mean())</code></pre>
   </div>
 </section>
 
 <section>
   <div class="wrap">
-    <p class="kicker">Reflection</p>
-    <h2>What rebuilding it taught me</h2>
-    <ul class="learn">
-      <li><b>Implementing demystifies.</b> Gradient descent and the normal equations stop being magic the moment you've written them yourself.</li>
-      <li><b>Regularisation is a worldview.</b> The penalty term encodes a belief that simpler is safer — and lasso turns that belief into automatic feature selection.</li>
-      <li><b>Validation is the real science.</b> A model's training score is vanity; cross-validation is the only honest measure of what it'll do in the wild.</li>
-      <li><b>Bias–variance explains everything.</b> Almost every failure and fix in ML is a move along this one axis.</li>
-      <li><b>Simple models earn their keep.</b> A well-regularised linear model is interpretable, fast, and shockingly competitive — the baseline you must beat.</li>
-    </ul>
+    <p class="kicker">Results</p>
+    <h2>Real numbers from <code>python demo.py</code></h2>
+    <p>The demo trains every method on two standard datasets, using scikit-learn only to load the data. These are the actual printed metrics from a run:</p>
+    <table class="metrics">
+      <caption>Regression — diabetes (442 samples, 10 features), 75/25 train/test split.</caption>
+      <thead><tr><th>Model</th><th>Metric</th></tr></thead>
+      <tbody>
+        <tr><td>OLS — normal equation</td><td class="v">R² = 0.3728</td></tr>
+        <tr><td>OLS — gradient descent</td><td class="v">R² = 0.3728</td></tr>
+        <tr><td>Ridge (α = 10)</td><td class="v">R² = 0.3696</td></tr>
+        <tr><td>Lasso (α = 0.5, 9/10 features kept)</td><td class="v">R² = 0.3733</td></tr>
+        <tr><td>Decision tree (depth 3)</td><td class="v">R² = 0.2043</td></tr>
+        <tr><td>OLS — 5-fold CV</td><td class="v">R² = 0.4875 ± 0.0751</td></tr>
+      </tbody>
+    </table>
+    <table class="metrics" style="margin-top:28px">
+      <caption>Classification — breast cancer (569 samples, 30 features), standardised.</caption>
+      <thead><tr><th>Model</th><th>Metric</th></tr></thead>
+      <tbody>
+        <tr><td>Logistic regression</td><td class="v">acc = 0.9580</td></tr>
+        <tr><td>Decision tree (depth 4)</td><td class="v">acc = 0.9231</td></tr>
+        <tr><td>Logistic — 5-fold CV</td><td class="v">acc = 0.9736 ± 0.0124</td></tr>
+        <tr><td>Tree — OOB bootstrap</td><td class="v">acc = 0.9207 ± 0.0177</td></tr>
+      </tbody>
+    </table>
+    <p class="muted" style="margin-top:22px">Two details that double as sanity checks: the normal-equation and gradient-descent solvers reach an identical test R² (0.3728), and lasso drops one of the ten diabetes features while holding the same accuracy — regularisation doing feature selection.</p>
   </div>
 </section>
 
@@ -134,7 +167,7 @@
   <div class="wrap">
     <div class="credit">
       <div class="k">About this build</div>
-      <p style="margin:0">An original, from-scratch build by <b>Andrea</b> — written to learn the foundations of statistical learning by implementing them: regression, gradient descent, regularisation, trees, cross-validation and bias–variance analysis. Plain HTML/CSS, deployed on GitHub Pages.</p>
+      <p style="margin:0">An original, from-scratch build by <b>Andrea</b> — the <code>statlearn</code> library is pure Python + numpy, with a pytest suite that cross-checks every method against scikit-learn. The full source, tests and demo live in the repository; this page is deployed on GitHub Pages.</p>
     </div>
     <p class="fine">Built from scratch by Andrea · one of an ongoing series of learning builds.</p>
   </div>

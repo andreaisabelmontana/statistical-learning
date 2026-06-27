@@ -1,0 +1,8 @@
+# Runtime dependency for the statlearn library
+numpy>=1.21
+
+# Dev / test only — used to generate datasets in the demo and to
+# cross-check the from-scratch implementations in the test suite.
+# The library algorithms themselves never import scikit-learn.
+scikit-learn>=1.0
+pytest>=7.0
